@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Navratri Ticket Booking</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 40px;
+      }
+      input,
+      button {
+        margin: 10px 0;
+        padding: 8px;
+        width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎟 Navratri Ticket Booking Test</h1>
+
+    <h3>Step 1: Create Booking</h3>
+    <input id="date" type="date" placeholder="Select date" />
+    <input id="tickets" type="number" placeholder="No. of tickets" />
+    <button onclick="createBooking()">Create Booking</button>
+    <div id="bookingStatus"></div>
+
+    <h3>Step 2: Add User Details</h3>
+    <input id="name" type="text" placeholder="Your Name" />
+    <input id="email" type="email" placeholder="Your Email" />
+    <input id="phone" type="text" placeholder="Phone Number" />
+    <button onclick="addUser()">Add User</button>
+    <div id="userStatus"></div>
+
+    <h3>Step 3: Pay</h3>
+    <button onclick="payNow()">Pay ₹100</button>
+    <div id="paymentStatus"></div>
+
+    <script>
+      let bookingId = null;
+      let razorpayOrderId = null;
+
+      const BACKEND_URL = "http://localhost:5000"; // change this to your backend URL
+
+      async function createBooking() {
+        const booking_date = document.getElementById("date").value;
+        const num_tickets = document.getElementById("tickets").value;
+
+        const res = await fetch(`${BACKEND_URL}/booking`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ booking_date, num_tickets }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          bookingId = data.booking.id;
+          document.getElementById(
+            "bookingStatus"
+          ).innerText = `Booking created with ID: ${bookingId}`;
+        }
+      }
+
+      async function addUser() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+
+        const res = await fetch(`${BACKEND_URL}/user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ booking_id: bookingId, name, email, phone }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById("userStatus").innerText =
+            "User added successfully!";
+        }
+      }
+
+      async function payNow() {
+        const amount = 100;
+
+        const orderRes = await fetch(`${BACKEND_URL}/payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ booking_id: bookingId, amount }),
+        });
+
+        const { order } = await orderRes.json();
+        razorpayOrderId = order.id;
+
+        const options = {
+          key: "rzp_test_fG53Ux0WVcZCMK",
+          amount: order.amount,
+          currency: "INR",
+          name: "Navratri Dandiya",
+          description: "Ticket Purchase",
+          order_id: order.id,
+          handler: async function (response) {
+            const confirmRes = await fetch(`${BACKEND_URL}/payment/confirm`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                booking_id: bookingId,
+                razorpay_order_id: order.id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                amount,
+              }),
+            });
+
+            const result = await confirmRes.json();
+            if (result.success) {
+              document.getElementById("paymentStatus").innerText =
+                "🎉 Payment successful! Ticket sent via email.";
+            } else {
+              document.getElementById("paymentStatus").innerText =
+                "❌ Payment confirmed but ticket failed.";
+            }
+          },
+          prefill: {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            contact: document.getElementById("phone").value,
+          },
+          theme: { color: "#F37254" },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      }
+    </script>
+  </body>
+</html>
