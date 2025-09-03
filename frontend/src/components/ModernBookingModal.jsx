@@ -10,7 +10,7 @@ const ModernBookingModal = () => {
   const [bookingId, setBookingId] = useState(null);
   const [ticketData, setTicketData] = useState({
     booking_date: "",
-    pass_type: "couple",
+    pass_type: [], // allow multiple selection
     num_tickets: 1,
   });
   const [userData, setUserData] = useState({ name: "", email: "", phone: "" });
@@ -26,12 +26,20 @@ const ModernBookingModal = () => {
       alert("Please select date and number of tickets");
       return;
     }
+    // Validation: Boys pass only if Girl pass is selected
+    if (
+      ticketData.pass_type.includes("boys") &&
+      !ticketData.pass_type.includes("girls")
+    ) {
+      alert("At least one Girl ticket must be booked before booking Boys ticket.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(`${backendURL}/api/booking`, {
         booking_date: ticketData.booking_date,
         num_tickets: ticketData.num_tickets,
-        pass_type: ticketData.pass_type, // include pass_type here
+        pass_type: ticketData.pass_type, // send array
       });
       if (res.data.success) {
         setBookingId(res.data.booking.id);
@@ -185,14 +193,73 @@ const ModernBookingModal = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">Pass Type</label>
-                  <select
-                    value={ticketData.pass_type}
-                    onChange={(e) => setTicketData({ ...ticketData, pass_type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:outline-none"
-                  >
-                    <option value="couple">Couple Pass (₹400)</option>
-                    <option value="group">Group of Girls (₹200)</option>
-                  </select>
+                  <div className="flex flex-col gap-2">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={ticketData.pass_type.includes("couple")}
+                        onChange={e => {
+                          let selected = [...ticketData.pass_type];
+                          if (e.target.checked) {
+                            selected = ["couple"];
+                          } else {
+                            selected = selected.filter(opt => opt !== "couple");
+                          }
+                          setTicketData({ ...ticketData, pass_type: selected });
+                        }}
+                        disabled={ticketData.pass_type.includes("girls") || ticketData.pass_type.includes("boys")}
+                        className="mr-2"
+                      />
+                      Couple Pass (₹400)
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={ticketData.pass_type.includes("girls")}
+                        onChange={e => {
+                          let selected = [...ticketData.pass_type];
+                          if (e.target.checked) {
+                            selected = selected.filter(opt => opt !== "couple");
+                            selected.push("girls");
+                          } else {
+                            selected = selected.filter(opt => opt !== "girls");
+                            // If boys is selected but girls is now unchecked, remove boys too
+                            if (selected.includes("boys")) {
+                              selected = selected.filter(opt => opt !== "boys");
+                            }
+                          }
+                          setTicketData({ ...ticketData, pass_type: selected });
+                        }}
+                        disabled={ticketData.pass_type.includes("couple")}
+                        className="mr-2"
+                      />
+                      Girl (₹200)
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={ticketData.pass_type.includes("boys")}
+                        onChange={e => {
+                          let selected = [...ticketData.pass_type];
+                          if (e.target.checked) {
+                            // Only allow boys if girls is also selected
+                            if (!selected.includes("girls")) {
+                              alert("At least one Girl ticket must be booked before booking Boys ticket.");
+                              return;
+                            }
+                            selected = selected.filter(opt => opt !== "couple");
+                            selected.push("boys");
+                          } else {
+                            selected = selected.filter(opt => opt !== "boys");
+                          }
+                          setTicketData({ ...ticketData, pass_type: selected });
+                        }}
+                        disabled={ticketData.pass_type.includes("couple")}
+                        className="mr-2"
+                      />
+                      Boy (₹200)
+                    </label>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">Number of Tickets</label>
@@ -298,7 +365,6 @@ const ModernBookingModal = () => {
         {step === 3 && (
           <div className="flex flex-col items-center justify-center">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 mx-auto">
-             
               <h3 className="text-lg text-center  font-bold mb-2 text-gray-800">Order Summary</h3>
               <div className="bg-blue-50 rounded-xl p-5 mb-4">
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
@@ -306,15 +372,45 @@ const ModernBookingModal = () => {
                   <div className="text-right font-semibold text-gray-800">Malang Ras Dandiya 2025</div>
                   <div className="text-gray-600 font-medium">Date:</div>
                   <div className="text-right font-semibold text-gray-800">{ticketData.booking_date}</div>
-                  <div className="text-gray-600 font-medium">Pass Type:</div>
-                  <div className="text-right font-semibold text-gray-800">{ticketData.pass_type === 'couple' ? 'Couple Pass' : 'Group of Girls'}</div>
+                  <div className="text-gray-600 font-medium">Pass Type(s):</div>
+                  <div className="text-right font-semibold text-gray-800">
+                    {ticketData.pass_type.length === 0 ? '-' : ticketData.pass_type.map((type, idx) => {
+                      if (type === 'couple') return 'Couple Pass';
+                      if (type === 'girls') return 'Girl';
+                      if (type === 'boys') return 'Boy';
+                      return type;
+                    }).join(', ')}
+                  </div>
                   <div className="text-gray-600 font-medium">Tickets:</div>
                   <div className="text-right font-semibold text-gray-800">{ticketData.num_tickets}</div>
-                  <div className="text-gray-600 font-medium">Price per ticket:</div>
-                  <div className="text-right font-semibold text-gray-800">₹{ticketData.pass_type === 'couple' ? 400 : 200}</div>
+                  {/* Price breakdown for each pass type */}
+                  {ticketData.pass_type.includes('couple') && (
+                    <>
+                      <div className="text-gray-600 font-medium">Couple Pass (₹400)</div>
+                      <div className="text-right font-semibold text-gray-800">₹{400 * ticketData.num_tickets}</div>
+                    </>
+                  )}
+                  {ticketData.pass_type.includes('girls') && (
+                    <>
+                      <div className="text-gray-600 font-medium">Girl (₹200)</div>
+                      <div className="text-right font-semibold text-gray-800">₹{200 * ticketData.num_tickets}</div>
+                    </>
+                  )}
+                  {ticketData.pass_type.includes('boys') && (
+                    <>
+                      <div className="text-gray-600 font-medium">Boy (₹200)</div>
+                      <div className="text-right font-semibold text-gray-800">₹{200 * ticketData.num_tickets}</div>
+                    </>
+                  )}
                   <div className="col-span-2 border-t border-gray-200 my-2"></div>
-                  <div className="text-lg font-bold text-gray-700">Total:</div>
-                  <div className="text-lg font-extrabold text-right text-gray-900">₹{(ticketData.pass_type === 'couple' ? 400 : 200) * ticketData.num_tickets}</div>
+                  <div className="text-lg font-bold text-gray-700">Grand Total:</div>
+                  <div className="text-lg font-extrabold text-right text-gray-900">
+                    ₹{
+                      (ticketData.pass_type.includes('couple') ? 400 * ticketData.num_tickets : 0) +
+                      (ticketData.pass_type.includes('girls') ? 200 * ticketData.num_tickets : 0) +
+                      (ticketData.pass_type.includes('boys') ? 200 * ticketData.num_tickets : 0)
+                    }
+                  </div>
                 </div>
               </div>
               <div className="mb-4">

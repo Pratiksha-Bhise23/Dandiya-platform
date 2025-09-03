@@ -1,18 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo2 from "../assets/logo2.jpeg";
+import bgVideo from "../assets/bg.mp4";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
-      {/* Hero Section */}
-      <div className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1506157786151-b8491531f063?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')" }}>
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="text-center text-white">
+      {/* Hero Section with Video Background */}
+      <div className="relative h-screen w-full overflow-hidden">
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src={bgVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+          <div className="text-center text-white relative z-20">
             <img src={logo2} alt="Malang Ras Dandiya" className="mx-auto w-40 mb-6" />
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">Malang Ras Dandiya 2025</h1>
+            {/* <h1 className="text-5xl md:text-6xl font-bold mb-4">Malang Ras Dandiya 2025</h1> */}
             <p className="text-xl mb-6">Chh. Sambhaji Nagar's Biggest Navratri Celebration</p>
             <button
               onClick={() => navigate("/booking")}
@@ -67,12 +76,12 @@ const LandingPage = () => {
             <div className="relative w-full h-72 md:h-96 rounded-2xl overflow-hidden shadow-lg">
               <img
                 src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Grand Ballroom"
+                alt="Regal Lawns & Hall"
                 className="w-full h-full object-cover"
               />
               <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 rounded-b-2xl">
-                <h3 className="text-white text-2xl font-bold">Grand Ballroom</h3>
-                <p className="text-gray-200 text-sm">Capacity: 500+ People</p>
+                <h3 className="text-white text-2xl font-bold">Regal Lawns & Hall</h3>
+                {/* <p className="text-gray-200 text-sm">Capacity: 500+ People</p> */}
               </div>
             </div>
           </div>
@@ -83,15 +92,16 @@ const LandingPage = () => {
               <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 hover:shadow-xl transition-all border-l-4 border-blue-400">
                 <div className="flex items-center gap-2 text-blue-500 text-xl font-bold"><span>📍</span> Address</div>
                 <div className="text-gray-700 text-sm">
-                  Grand Ballroom, Taj Palace Hotel<br/>
-                  Apollo Bunder, Colaba<br/>
-                  Mumbai, Maharashtra 400001
+                    
+                 Beed Bypass Rd, Darshan Vihar Colony,<br/>
+                Mirajgave Nagari, Chhatrapati Sambhajinagar,<br/>
+                 Maharashtra 431009
                 </div>
               </div>
               {/* Timing Card */}
               <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 hover:shadow-xl transition-all border-l-4 border-purple-400">
                 <div className="flex items-center gap-2 text-purple-500 text-xl font-bold"><span>⏰</span> Timing</div>
-                <div className="text-gray-700 text-sm">7:00 PM – 12:00 AM</div>
+                <div className="text-gray-700 text-sm">7:00 PM – 11:00 PM</div>
               </div>
               {/* Contact Card */}
               <div className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 hover:shadow-xl transition-all border-l-4 border-green-400">
@@ -114,7 +124,8 @@ const LandingPage = () => {
         {/* Venue Map */}
         <div className="bg-gray-200 p-6 rounded-lg shadow mt-10">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15129.981768473693!2d75.891!3d19.878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd684!2sAurangabad!5e0!3m2!1sen!2sin!4v1699999999"
+            // src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15129.981768473693!2d75.891!3d19.878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd684!2sAurangabad!5e0!3m2!1sen!2sin!4v1699999999"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3752.7542083029725!2d75.3499744!3d19.850350299999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdba27a8820d35b%3A0x8ba350e85183604b!2sRegal%20Lawns%20%26%20Hall!5e0!3m2!1sen!2sin!4v1756382969521!5m2!1sen!2sin"
             width="100%"
             height="250"
             style={{ border: 0 }}

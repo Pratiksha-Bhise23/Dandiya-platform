@@ -25,7 +25,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span>⏰</span>
-                <span>5:00 PM onwards</span>
+                <span>7:00 PM onwards</span>
               </div>
               <div className="flex items-center gap-2">
                 <span>📍</span>
