@@ -1,29 +1,3 @@
-// const nodemailer = require("nodemailer");
-// require("dotenv").config();
-
-// const transporter = nodemailer.createTransport({
-//   host: process.env.EMAIL_HOST,
-//   port: parseInt(process.env.EMAIL_PORT),
-//   secure: process.env.EMAIL_SECURE === "true",
-//   auth: {
-//     user: process.env.EMAIL_USER,
-//     pass: process.env.EMAIL_PASS,
-//   },
-// });
-
-// async function sendTicketEmail(toEmail, subject, text, attachments) {
-//   const info = await transporter.sendMail({
-//     from: `"Navratri Dandiya" <${process.env.EMAIL_USER}>`,
-//     to: toEmail,
-//     subject,
-//     text,
-//     attachments, // ✅ can be array now
-//   });
-//   return info;
-// }
-
-// module.exports = { sendTicketEmail };
-
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
