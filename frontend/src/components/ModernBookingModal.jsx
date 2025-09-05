@@ -49,11 +49,13 @@ const ModernBookingModal = () => {
     }
     setLoading(true);
     try {
-      const ticketsObj = ticketData.tickets || { couple: 0, girls: 0, boys: 0 };
-      const num_tickets = Object.values(ticketsObj).reduce((a, b) => a + b, 0);
+      // Fix: Send the actual ticket counts instead of undefined tickets object
+      const ticketsObj = ticketData.ticket_counts;
+      const num_tickets = totalTickets;
+      
       const res = await axios.post(`${backendURL}/api/booking`, {
         booking_date: ticketData.booking_date,
-        tickets: ticketsObj,
+        tickets: ticketsObj, // This should now contain {couple: x, girls: y, boys: z}
         num_tickets,
       });
       if (res.data.success) {
@@ -595,14 +597,14 @@ const ModernBookingModal = () => {
               <div className="bg-white rounded-xl shadow p-5 flex-1 min-w-[280px]">
                 <span className="font-bold text-lg text-gray-800 block mb-2">Event Information</span>
                 <div className="text-sm text-gray-700 space-y-1">
-                  <div className="flex items-center gap-2"><span className="material-icons text-purple-400">event</span> 4 August 2025</div>
+                  <div className="flex items-center gap-2"><span className="material-icons text-purple-400">event</span> {ticketData.booking_date}</div>
                   <div className="flex items-center gap-2"><span className="material-icons text-orange-400">schedule</span> 7:00 PM onwards</div>
-                  <div className="flex items-center gap-2"><span className="material-icons text-green-400">location_on</span> Mumbai, Maharashtra</div>
+                  <div className="flex items-center gap-2"><span className="material-icons text-green-400">location_on</span> Shivaji Ground, Aurangabad</div>
                 </div>
               </div>
             </div>
             
-            <div className="w-full max-w-4xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* <div className="w-full max-w-4xl mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-blue-50 rounded-xl shadow p-5">
                 <span className="font-bold text-lg text-blue-700 block mb-2">Important Reminders</span>
                 <ul className="list-disc pl-5 text-sm text-blue-900 space-y-1">
@@ -612,7 +614,7 @@ const ModernBookingModal = () => {
                   <li>Check your email for detailed event information</li>
                 </ul>
               </div>
-            </div>
+            </div> */}
             <button onClick={resetBooking} className="bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-6 rounded-lg hover:from-orange-600 hover:to-red-600 transition duration-300" >
               Book Again
             </button>
