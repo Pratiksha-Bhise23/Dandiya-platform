@@ -12,7 +12,7 @@ const LandingPage = () => {
       <div className="relative h-screen w-full overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover"
-          src="../public/bg.mp4"
+          src="/bg.mp4"
           autoPlay
           loop
           muted
